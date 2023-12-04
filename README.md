@@ -13,24 +13,24 @@ Run an `avahi-daemon` instance to advertise `_smb._tcp`, `_adisk._tcp`, and `_de
 $ docker run -d --restart always --net host --uts host ghcr.io/jmanero/timemachine avahi-daemon
 ```
 
-
-
 ### 2. File Sharing Service
 
 Generate `smb.conf` and run `smbd`. See `Containerfile` ENV statements for configuration options
 
 ```
-$ docker run -d --restart always --volume $TM_DISK:/data --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $PRIVATE/passdb.tdb:/var/lib/samba/private/passdb.tdb --publish 445:445/tcp --publish 139:139/tcp --security-opt label=disable --uts host ghcr.io/jmanero/timemachine
+$ docker run -d --restart always --volume $TM_DISK:/data --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $TM_PRIVATE:/var/lib/samba --tmpfs /run --read-only --publish 445:445/tcp --publish 139:139/tcp --security-opt label=disable --uts host ghcr.io/jmanero/timemachine
 ```
 
 ### 3. Passwords
 
-Use `pdbedit` to configure password bindings for local users. `smbd` is configured uses its own database to store password hashes for enabled users
+Use `pdbedit` to configure password bindings for local SMB users. `smbd` is configured to use a local database in the $TM_PRIVATE volume to store password hashes for enabled users:
 
 ```
-$ docker run -it --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume PRIVATE/passdb.tdb:/var/lib/samba/private/passdb.tdb pdbedit --create --user $USERNAME --homedir /data/$USERNAME
+$ docker exec -it $TM_SMB_CONTAINER_ID pdbedit --create --user $USERNAME --homedir /data/$USERNAME
+password: ...
+password again: ...
 ```
 
-> **NOTE**
-> - Users must already exist in `/etc/passwd` to add them to the samba password database
+> **NOTES**
+> - Users must already exist in `/etc/passwd` to be added to the samba password database
 > - The `pdbedit` utility has a `--password-from-stdin` flag that can be used to automate user provisioning

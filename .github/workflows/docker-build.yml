@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '*.md' # Don't trigger builds for documentation changes
+
   workflow_dispatch:
     inputs: {}
 
