@@ -1,0 +1,48 @@
+[global]
+  workgroup = LOCAL
+  server string = Time Machine Samba Server
+  server role = standalone server
+  server min protocol = SMB2_02
+
+  log file = ${LOG_FILE}
+  max log size = ${MAX_LOG_SIZE}
+
+  state directory = ${STATE_DIR}
+  cache directory = ${CACHE_DIR}
+  private directory = ${PRIVATE_DIR}
+  lock directory = ${LOCK_DIR}
+  pid directory = ${PID_DIR}
+
+  dns proxy = no
+  load printers = no
+  local master = yes
+  printcap name = /dev/null
+
+  passdb backend = ${PASSDB_BACKEND}
+  guest account = nobody
+  ntlm auth = ntlmv2-only
+  restrict anonymous = 2
+
+  smbd max xattr size = 2097152
+  posix locking = no
+  guest ok = no
+
+  fruit:aapl = yes
+  fruit:nfs_aces = no
+  fruit:model = MacSamba
+
+[timemachine]
+  comment = Time Machine
+  vfs objects = fruit streams_xattr
+  path = ${TIMEMACHINE_PATH}
+  
+  available = yes
+  browseable = yes
+  writable = yes
+  
+  fruit:metadata = stream
+  fruit:resource = stream
+  smbd max xattr size = ${MAX_XATTR_SIZE}
+  
+  fruit:time machine = yes
+  fruit:time machine max size = ${TIMEMACHINE_MAX_SIZE}

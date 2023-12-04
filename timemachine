@@ -1,0 +1,7 @@
+#!/bin/sh -ex
+
+mkdir -p "$(dirname "$CONF_FILE")" "$LOCK_DIR" "$STATE_DIR" "$CACHE_DIR" "$PRIVATE_DIR"
+envsubst </etc/samba/smb.conf.template >"$CONF_FILE"
+
+testparm --suppress-prompt "$CONF_FILE"
+exec /usr/sbin/smbd --configfile "$CONF_FILE" --foreground --no-process-group --debuglevel "$DEBUG_LEVEL" </dev/null
